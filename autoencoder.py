@@ -9,9 +9,10 @@ class Autoencoder():
         self.net = Net(input_dims, code_dims).to(self.device)
         self.optimizer = torch.optim.Adam(self.net.parameters(), lr)
         
-        #self.criterion = torch.nn.BCELoss()
-        self.criterion = torch.nn.MSELoss()
-        self.unreduced_criterion = torch.nn.MSELoss(reduction = 'none')
+        self.criterion = torch.nn.BCELoss()
+        self.unreduced_criterion = torch.nn.BCELoss(reduction = 'none')
+        #self.criterion = torch.nn.MSELoss()
+        #self.unreduced_criterion = torch.nn.MSELoss(reduction = 'none')
         
         self.input_dims = input_dims
         self.size = 0
@@ -20,8 +21,8 @@ class Autoencoder():
         self.std = 0
         
     def optimize_params(self, x, label):
-        x = x.to(self.device).reshape(-1, self.input_dims)
-        label = label.to(self.device).reshape(-1, self.input_dims)
+        x = x.reshape(-1, self.input_dims).to(self.device)
+        label = label.reshape(-1, self.input_dims).to(self.device)
         y = self._forward(x)
         
         self._update_params(y, label)
@@ -30,14 +31,9 @@ class Autoencoder():
     def _forward(self, x):
         return self.net(x)
 
-    def _backward(self, y, label):
-        self.loss = self.criterion(y, label)
-        self.loss.backward()
-        #self.accelerator.backward(self.loss)
-
     def _update_params(self, y, label):
         self.optimizer.zero_grad()
-        self._backward(y, label)
+        self.criterion(y, label).backward()
         self.optimizer.step()
         #self.scheduler.step()  # scheduler step in each iteration
         
@@ -54,18 +50,20 @@ class Autoencoder():
         #print(new_mean, new_var, new_size)
             
         #updating variance
-        part1 = ((self.size - 1)*self.var + (new_size - 1)*new_var)/(self.size + new_size - 1)
-        part2 = ((self.size*new_size)*np.square((self.mean - new_mean)))/((self.size + new_size)*(self.size+new_size - 1))
-        self.var = part1 + part2
+        #part1 = ((self.size - 1)*self.var + (new_size - 1)*new_var)/(self.size + new_size - 1)
+        #part2 = ((self.size*new_size)*np.square((self.mean - new_mean)))/((self.size + new_size)*(self.size+new_size - 1))
+        #self.var = part1 + part2
             
         #updating std
-        self.std = np.sqrt(self.var)
+        self.std = np.sqrt(new_var)
+        #self.std = np.sqrt(self.var)
         #print(self.std)
             
         #updating mean
-        with torch.no_grad():
-            new_sum = torch.sum(new_loss).item()
-        self.mean = (self.size*self.mean + new_sum)/(self.size + new_size)
+        self.mean = new_mean
+        #with torch.no_grad():
+        #    new_sum = torch.sum(new_loss).item()
+        #self.mean = (self.size*self.mean + new_sum)/(self.size + new_size)
             
         #updating size
         self.size += new_size
