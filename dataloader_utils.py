@@ -6,7 +6,7 @@ import torchvision
 
 from permutedMNIST import PermutedMNIST
 from splittedMNIST import SplittedMNIST
-from permutedAndSplittedMNIST import PermutedAndSplittedMNIST
+from splittedAndShuffledMNIST import SplittedAndShuffledMNIST
 
 def get_conbined_permute_mnist(num_task, batch_size, random_seed):
     assert num_task>0
@@ -79,7 +79,7 @@ def get_conbined_split_mnist(num_task, batch_size, random_seed):
 
     return random.sample(list(train_dataloader), len(train_dataloader)), random.sample(list(test_dataloader), len(test_dataloader))
 
-def get_conbined_permute_and_split_mnist(num_task, batch_size, random_seed):
+def get_conbined_splitted_and_shuffled_mnist(num_task, batch_size, random_seed):
     assert num_task<=5 and num_task>0
     np_rand.seed(random_seed)
     classes = {}
@@ -100,11 +100,10 @@ def get_conbined_permute_and_split_mnist(num_task, batch_size, random_seed):
 
     idx = list(range(28 * 28))
     np_rand.shuffle(idx)
-    
     for j in range(num_task):
         class_indices = classes[j]
-        train_datasets[j] = PermutedAndSplittedMNIST(train=True, permute_idx=idx, class_indices=class_indices, task_num=j)
-        test_datasets[j] = PermutedAndSplittedMNIST(train=False, permute_idx=idx, class_indices=class_indices, task_num=j)
+        train_datasets[j] = SplittedAndShuffledMNIST(train=True, shuffle_idx=idx, class_indices=class_indices, task_num=j)
+        test_datasets[j] = SplittedAndShuffledMNIST(train=False, shuffle_idx=idx, class_indices=class_indices, task_num=j)
 
     train_dataset = data.ConcatDataset([x for _,x in train_datasets.items()])
     test_dataset = data.ConcatDataset([x for _,x in test_datasets.items()])
@@ -118,4 +117,4 @@ def get_conbined_permute_and_split_mnist(num_task, batch_size, random_seed):
                                                   shuffle = False)
 
 
-    return random.sample(list(train_dataloader), len(train_dataloader)), random.sample(list(test_dataloader), len(test_dataloader))
+    return random.sample(list(train_dataloader), len(train_dataloader)), random.sample(list(test_dataloader), len(test_dataloader)), idx
