@@ -17,6 +17,7 @@ class SplittedMNIST(datasets.MNIST):
             subset = torch.utils.data.Subset(raw_mnist_train.data, indices)
             self.data_train = torch.stack([img.float().view(-1)/255 for img in subset])
             self.targets = torch.utils.data.Subset(raw_mnist_train.targets, indices)
+            self.targets = torch.tensor([0 if int(x.item())==class_indices[0] else 1 for x in self.targets])
         else:
             raw_mnist_test = datasets.MNIST(root=root, train=False, download=True)
             indices = [i for i, (e, c) in enumerate(raw_mnist_test) if c in class_indices]
@@ -24,6 +25,7 @@ class SplittedMNIST(datasets.MNIST):
             subset = torch.utils.data.Subset(raw_mnist_test.data, indices)
             self.data_test = torch.stack([img.float().view(-1)/255 for img in subset])
             self.targets = torch.utils.data.Subset(raw_mnist_test.targets, indices)
+            self.targets = torch.tensor([0 if int(x.item())==class_indices[0] else 1 for x in self.targets])
 
     def __len__(self):
         return len(self.targets)
