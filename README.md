@@ -1,6 +1,6 @@
 24 Spring ECE 7143 Final Project Topic 2
 
-tqdm==4.65.0 is not mandatory requirement. It only shows in our ipynb files for progress bar. 
+tqdm==4.65.0 is not a mandatory requirement. We only use in our ipynb files for progress bar. 
 
 train.ipynb is a sample training script
 
