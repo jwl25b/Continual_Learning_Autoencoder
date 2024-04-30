@@ -4,5 +4,7 @@ tqdm==4.65.0 is not a mandatory requirement. We only use in our ipynb files for 
 
 train.ipynb is a sample training script
 
+
 autoencoder_verification contains miscellaneous and a various of test when we verifiying our idea. 
-autoencoder_test contains some experiments about autoencoder
+
+autoencoder_test contains some experiments about autoencoder. 
