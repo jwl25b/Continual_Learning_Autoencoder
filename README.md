@@ -7,4 +7,4 @@ train.ipynb is a sample training script
 
 autoencoder_verification contains miscellaneous and a various of test when we verifiying our idea. 
 
-autoencoder_test contains some experiments about autoencoder. 
+autoencoder_test, train_autoencoders_plot contain our experiments. 
